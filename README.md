@@ -32,7 +32,7 @@ The usage of the module within your own main.tf file is as follows:
       project_id                      = "example-project"
       name                            = "demo-cf-export"
       cs_schedule                     = "*/10 * * * *"
-      gsuite_exporter_service_account = "gsuite-exporter-sa@example-project.iam.gserviceaccount.com
+      gsuite_exporter_service_account = "gsuite-exporter-sa@example-project.iam.gserviceaccount.com"
       gsuite_admin_user               = "admin@example.com"
     }
 ```
@@ -53,8 +53,3 @@ The usage of the module within your own main.tf file is as follows:
 
 | Name | Description |
 |------|-------------|
-| splunk-sa-key | Service Account Key used for Splunk to Subscribe to the Pubsub |
-| topic-name    | The name of the pub/sub topic where logs are sent to |
-| subscription-name | The name of the subscription which Splunk should pull logs from |
-| project           | The Project which hosts the pubsub topic and subscription resources |
-| organization_sink_writer | The Service Account associated with the organization sink.  Ensure this account has publish permissions to a pubsub topic |
