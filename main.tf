@@ -45,7 +45,7 @@ resource "null_resource" "cloud-scheduler" {
     command = "gcloud beta scheduler jobs create pubsub gsuite-audit-log-scheduler --schedule=\"${var.cs_schedule}\" --topic=${google_pubsub_topic.trigger-topic.name} --message-body='{\"PROJECT_ID\":\"${var.project_id}\",\"GSUITE_ADMIN_USER\":\"${var.gsuite_admin_user}\"}' --project=${var.project_id}" 
   }
 
-    provisioner "local-exec" {
+  provisioner "local-exec" {
     when = "destroy"
     command = "gcloud beta scheduler jobs delete gsuite-audit-log-scheduler --project=${var.project_id} --quiet"
   }
