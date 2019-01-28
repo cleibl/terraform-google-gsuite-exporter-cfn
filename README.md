@@ -26,11 +26,28 @@ The following GSuite Admin APIs are currently supported:
 The following destinations are currently supported:
 - [Stackdriver Logging](https://cloud.google.com/logging/docs/)
 
-## Requirements
-* A GSuite Admin account
-* A service account with:
+### Service account
+We need two Terraform service accounts for this module:
+* **Terraform service account** (that will create the Scheduler & Cloudfunction)
+* **CloudFunction service account** (that will be used by the CloudFunction to pull logs from GSuite and write them to Stackdriver Logging)
+
+The **Terraform service account** used to run this module must have the following IAM Roles:
+- `PubSub Admin` on the project to create the pubsub
+- `Storage Admin` on the project to create the storage accounts
+- `Service Account User` on the project (to associate the Cloudfunction service account with the CloudFunction)
+- `Cloud Scheduler Admin` on the project to create the cloud scheduler
+- `CloudFunction Admin` on the project to create the cloud function.
+
+The **CloudFunction service account** passed to this module must have :
+- A GSuite Admin account
+- A service account with:
   * [GSuite domain-wide delegation](https://developers.google.com/admin-sdk/reports/v1/guides/delegation) enabled.
-  * The IAM role `roles/iam.tokenCreator` set on the organization.
+  * The IAM roles
+    - `roles/iam.tokenCreator` set on the organization.
+    - `roles/logging.viewer` set on the project to view logs
+    - `roles/logging.configWriter` set on the project to write logs to stackdriver
+
+
   * The following scopes in the [API client access page](https://admin.google.com/AdminHome?chromeless=1#OGX:ManageOauthClients)
     - https://www.googleapis.com/auth/admin.reports.audit.readonly (to read from the Reports API)
     - https://www.googleapis.com/auth/iam (to generate a super-admin token)
@@ -81,3 +98,21 @@ Then perform the following commands:
 - `terraform apply` to apply the infrastructure build
 - `terraform destroy` to destroy the built infrastructure
 
+
+## HLD
+
+This solution uses "serverless" architecture to pull GSuite Audit Logs from the Gsuite Admin APIs.  On each run, the python application will check the timestamp of the previously sync'd logs to ensure there are no duplicate logs entries
+
+
+![HLD](./img/GSuite-LogSync-CFN.png)
+
+1. Cloud Scheduler Runs, sending a message which includes data on the Gsuite-Admin-User and Project ID to the Pub/Sub Topic
+2. The PubSub Topic Triggers the Cloudfunction
+3. The Cloudfunction parses the PubSub message and executes a sync between Gsuite and Stackdriver
+4. The Gsuite Admin APIs return data to the cloudfunctions
+5. The Cloudfunctions pushes the logs to stackdriver under the following logNames:
+ - logName: /logs/login
+ - logName: /logs/audit
+ - logname: /logs/token
+ - logname: /logs/drive
+ - logname: /logs/mobile
