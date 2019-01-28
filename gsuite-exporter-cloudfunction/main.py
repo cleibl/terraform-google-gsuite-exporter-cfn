@@ -1,4 +1,3 @@
-import os
 import base64
 import json
 from gsuite_exporter.cli import sync_all
