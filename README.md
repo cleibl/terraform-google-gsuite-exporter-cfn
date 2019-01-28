@@ -6,9 +6,10 @@ The Terraform module can be used to provision a cloudfunction which gets Gsuite 
 For the GSuite Exporter to work, the following APIs must be enabled in the project:
 - Identity and Access Management API: `iam.googleapis.com`
 - Admin SDK API: `admin.googleapis.com`
-- PubSub API: 
-- CloudFunctions API: 
-- CloudStorage API:
+- PubSub API: `pubsub.googleapis.com`
+- Cloud Functions API: `cloudfunctions.googleapis.com`
+- Cloud Scheduler API: `cloudscheduler.googleapis.com`
+- App Engine API: `appengine.googleapis.com`
 
 
 ## Prerequisites 
