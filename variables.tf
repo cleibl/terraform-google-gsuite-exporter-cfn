@@ -9,6 +9,7 @@ variable "region" {
 }
 variable "name" {
     description = "The Prefix for resource names"
+    default = "demo-cf-export"
 }
 
 variable "gsuite_admin_user" {
