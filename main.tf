@@ -33,10 +33,6 @@ resource "google_cloudfunctions_function" "function" {
   runtime               = "python37"
   timeout               = 60
   entry_point           = "run"
-  environment_variables {
-    PROJECT_ID        = "${var.project_id}"
-    GSUITE_ADMIN_USER = "${var.gsuite_admin_user}"
-  }
   event_trigger {
       event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
       resource   = "${google_pubsub_topic.trigger-topic.name}"
