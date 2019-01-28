@@ -18,28 +18,6 @@ resource "google_storage_bucket_object" "archive" {
   source     = "${data.archive_file.source.output_path}"
 }
 
-
-// CloudFunctions Don't support Service Account or Region Parameter yet.  Right now its easier to call a gcloud command.  Going to keep this in here for later use
-
-/*
-resource "google_cloudfunctions_function" "function" {
-  //ToDO: Region is not a supported parameter yet
-  project               = "${var.project_id}"
-  name                  = "${var.name}-gsuite-exporter"
-  description           = "A Cloud Function to export G-Suite Logs"
-  available_memory_mb   = 128
-  source_archive_bucket = "${google_storage_bucket.bucket.name}"
-  source_archive_object = "${google_storage_bucket_object.archive.name}"
-  runtime               = "python37"
-  timeout               = 60
-  entry_point           = "run"
-  event_trigger {
-      event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
-      resource   = "${google_pubsub_topic.trigger-topic.name}"
-  }
-}
-*/
-
 //Work Around due to non-supported features of cloudfunctions
 
 resource "null_resource" "function-sa" {
