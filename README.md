@@ -2,6 +2,15 @@
 
 The Terraform module can be used to provision a cloudfunction which gets Gsuite Admin Logs and syncs them to stackdriver
 
+### APIs
+For the GSuite Exporter to work, the following APIs must be enabled in the project:
+- Identity and Access Management API: `iam.googleapis.com`
+- Admin SDK API: `admin.googleapis.com`
+- PubSub API: 
+- CloudFunctions API: 
+- CloudStorage API:
+
+
 ## Prerequisites 
 
 The following GSuite Admin APIs are currently supported:
@@ -13,6 +22,7 @@ The following GSuite Admin APIs are currently supported:
     - `mobile` - [Mobile activity reports](https://developers.google.com/admin-sdk/reports/v1/guides/manage-audit-mobile.html)
     - `token` - [Authorization Token activity reports](https://developers.google.com/admin-sdk/reports/v1/guides/manage-audit-tokens.html)
 
+
 The following destinations are currently supported:
 - [Stackdriver Logging](https://cloud.google.com/logging/docs/)
 
@@ -21,6 +31,9 @@ The following destinations are currently supported:
 * A service account with:
   * [GSuite domain-wide delegation](https://developers.google.com/admin-sdk/reports/v1/guides/delegation) enabled.
   * The IAM role `roles/iam.tokenCreator` set on the organization.
+  * The following scopes in the [API client access page](https://admin.google.com/AdminHome?chromeless=1#OGX:ManageOauthClients)
+    - https://www.googleapis.com/auth/admin.reports.audit.readonly (to read from the Reports API)
+    - https://www.googleapis.com/auth/iam (to generate a super-admin token)
 
 ## Usage
 The usage of the module within your own main.tf file is as follows:
@@ -53,3 +66,18 @@ The usage of the module within your own main.tf file is as follows:
 
 | Name | Description |
 |------|-------------|
+
+
+## Install
+
+### Terraform
+Be sure you have the correct Terraform version (0.11.x), you can choose the binary here:
+- https://releases.hashicorp.com/terraform/
+
+Then perform the following commands:
+
+- `terraform init` to get the plugins
+- `terraform plan` to see the infrastructure plan
+- `terraform apply` to apply the infrastructure build
+- `terraform destroy` to destroy the built infrastructure
+

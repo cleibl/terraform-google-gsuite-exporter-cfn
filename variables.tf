@@ -13,8 +13,7 @@ variable "name" {
 }
 
 variable "gsuite_admin_user" {
-    //TO-DO: Why does the Function need this information?
-    description = "The GSUITE Admin User Email address used in the function"
+    description = "The GSuite Admin user to impersonate"
 }
 
 
@@ -24,5 +23,5 @@ variable "cs_schedule" {
  }
 
  variable "gsuite_exporter_service_account" {
-     description = "The Domain-Wide Delegated Service account with permissions to pull gsuite admin logs"
+     description = "The service account for exporting GSuite data. Needs domain-wide delegation and correct access scopes."
   }
