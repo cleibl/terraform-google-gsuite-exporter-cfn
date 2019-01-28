@@ -106,13 +106,13 @@ This solution uses "serverless" architecture to pull GSuite Audit Logs from the 
 
 ![HLD](./img/GSuite-LogSync-CFN.png)
 
-1. Cloud Scheduler Runs, sending a message which includes data on the Gsuite-Admin-User and Project ID to the Pub/Sub Topic
+1. Cloud Scheduler Runs at a defined interval (default is 10 minutes), sending a message which includes data on the Gsuite-Admin-User and Project ID to the Pub/Sub Topic
 2. The PubSub Topic Triggers the Cloudfunction
 3. The Cloudfunction parses the PubSub message and executes a sync between Gsuite and Stackdriver
 4. The Gsuite Admin APIs return data to the cloudfunctions
 5. The Cloudfunctions pushes the logs to stackdriver under the following logNames:
- - logName: /logs/login
- - logName: /logs/audit
- - logname: /logs/token
- - logname: /logs/drive
- - logname: /logs/mobile
+    - logName: /logs/login
+    - logName: /logs/audit
+    - logname: /logs/token
+    - logname: /logs/drive
+    - logname: /logs/mobile
