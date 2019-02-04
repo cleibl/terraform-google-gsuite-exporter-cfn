@@ -2,7 +2,7 @@
 
 The Terraform module can be used to provision a cloudfunction which gets Gsuite Admin Logs and syncs them to stackdriver.
 
-The GSUITE Admin audit log shows a record of actions performed in your Google Admin console. For example, you can see when an administrator added a user or turned on a G Suite service.
+The Gsuite Admin audit log shows a record of actions performed in your Google Admin console. For example, you can see when an administrator added a user or turned on a G Suite service.
 
 Currently, these logs are only available as a CSV download and are not integrated into stackdriver by default.  This module solves this issue by created an export of these logs to a stackdriver workspace.
 
@@ -129,6 +129,6 @@ This solution uses "serverless" architecture to pull GSuite Audit Logs from the 
     - logname: /logs/drive
     - logname: /logs/mobile
 
-The Follow Image shows Gsuite Login Logs which have successfully be input in Stackdriver
+The following image shows Gsuite Login Logs which have successfully be input in Stackdriver
 
 ![Stackdriver](./img/GSUITE_ADMIN_LOGS.png)
