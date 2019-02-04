@@ -1,6 +1,10 @@
 # Terraform Stackdriver Aggregated Export to PubSub
 
-The Terraform module can be used to provision a cloudfunction which gets Gsuite Admin Logs and syncs them to stackdriver
+The Terraform module can be used to provision a cloudfunction which gets Gsuite Admin Logs and syncs them to stackdriver.
+
+The GSUITE Admin audit log shows a record of actions performed in your Google Admin console. For example, you can see when an administrator added a user or turned on a G Suite service.
+
+Currently, these logs are only available as a CSV download and are not integrated into stackdriver by default.  This module solves this issue by created an export of these logs to a stackdriver workspace.
 
 ### APIs
 For the GSuite Exporter to work, the following APIs must be enabled in the project:
@@ -75,7 +79,7 @@ The usage of the module within your own main.tf file is as follows:
 | region | The location of resources | string | `us-central1` | no |
 | project_id |The ID of the project where the pub/sub topic will be installed  | string | - | yes |
 | name | Prefix for resource naming | string | `demo-cf-export` | no |
-| cs_schedule| The Schedule which to trigger the function | string | `*/10 * * * *` | no |
+| cs_schedule| The Schedule which to trigger the function.  **THIS VARIABLE SHOULD NOT BE SET TO > 5 MINUTES, AS THIS CAN RESULT IN < 100% OF LOGS CAPTURED** | string | `*/10 * * * *` | no |
 | gsuite_exporter_service-account| The email address of the service account which has been added to the gsuite admin consle and has [GSuite domain-wide delegation](https://developers.google.com/admin-sdk/reports/v1/guides/delegation)  | string | - | yes |
 | gsuite_admin_user | The email of a gsuite admin user | string | - | yes |
 
@@ -88,9 +92,16 @@ The usage of the module within your own main.tf file is as follows:
 
 ## Install
 
+### Clone Repository
+Be sure [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) is installed on your system, then perform the following commands:
+
+```shell
+git clone https://github.com/cleibl/terraform-google-gsuite-exporter-cfn
+cd terrafrom-google-gsuite-exporter-cfn
+```
+
 ### Terraform
-Be sure you have the correct Terraform version (0.11.x), you can choose the binary here:
-- https://releases.hashicorp.com/terraform/
+Be sure you have the correct [Terraform](https://releases.hashicorp.com/terraform/) version (0.11.x)
 
 Then perform the following commands:
 
@@ -117,3 +128,7 @@ This solution uses "serverless" architecture to pull GSuite Audit Logs from the 
     - logname: /logs/token
     - logname: /logs/drive
     - logname: /logs/mobile
+
+The Follow Image shows Gsuite Login Logs which have successfully be input in Stackdriver
+
+![Stackdriver](./img/GSUITE_ADMIN_LOGS.png)
