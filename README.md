@@ -95,10 +95,10 @@ The usage of the module within your own main.tf file is as follows:
 ### Clone Repository
 Be sure [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) is installed on your system, then perform the following commands:
 
-```shell
-git clone https://github.com/cleibl/terraform-google-gsuite-exporter-cfn
-cd terrafrom-google-gsuite-exporter-cfn
-```
+
+- `git clone https://github.com/cleibl/terraform-google-gsuite-exporter-cfn` to clone the repository
+- `cd terrafrom-google-gsuite-exporter-cfn` to change directory to the repository
+
 
 ### Terraform
 Be sure you have the correct [Terraform](https://releases.hashicorp.com/terraform/) version (0.11.x)
