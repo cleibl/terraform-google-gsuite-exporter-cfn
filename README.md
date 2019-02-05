@@ -1,4 +1,4 @@
-# Terraform Stackdriver Aggregated Export to PubSub
+# Terraform Stackdriver Gsuite Audit Log Sync CloudFunction
 
 The Terraform module can be used to provision a cloudfunction which gets Gsuite Admin Logs and syncs them to stackdriver.
 
