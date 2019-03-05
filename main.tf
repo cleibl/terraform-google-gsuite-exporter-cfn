@@ -1,3 +1,12 @@
+provider "google" {
+  project     = "${var.project_id}"
+  region      = "${var.region}"
+}
+
+provider "google-beta" {
+  project     = "${var.project_id}"
+  region      = "${var.region}"
+}
 
 data "archive_file" "source" {
   type        = "zip"
@@ -8,45 +17,53 @@ data "archive_file" "source" {
 //ToDO: Add Required Services
 
 resource "google_storage_bucket" "bucket" {
-  project = "${var.project_id}"
-  name    = "${var.name}-gsuite-exporter"
+  provider = "google"
+  project  = "${var.project_id}"
+  name     = "${var.name}-gsuite-exporter"
 }
 
 resource "google_storage_bucket_object" "archive" {
+  provider   = "google"
   name       = "gsuite-exporter.zip"
   bucket     = "${google_storage_bucket.bucket.name}"
   source     = "${data.archive_file.source.output_path}"
 }
 
-//Work Around due to non-supported features of cloudfunctions
-
-resource "null_resource" "function-sa" {
-  depends_on = ["google_storage_bucket_object.archive"]
-  provisioner "local-exec" {
-    when = "create"
-    command = "gcloud beta functions deploy ${var.name}-gsuite-exporter --runtime python37 --source=gs://${google_storage_bucket.bucket.name}/${google_storage_bucket_object.archive.name} --stage-bucket=${google_storage_bucket.bucket.name} --service-account=${var.gsuite_exporter_service_account} --entry-point=run --memory=128MB --timeout=60 --trigger-topic=${google_pubsub_topic.trigger-topic.name} --set-env-vars=PROJECT_ID=${var.project_id},GSUITE_ADMIN_USER=${var.gsuite_admin_user} --region=${var.region} --project=${var.project_id}"
-  }
-
-  provisioner "local-exec" {
-      when = "destroy"
-      command = "gcloud beta functions delete ${var.name}-gsuite-exporter --region=${var.region}"
-  }
-}
-
 resource "google_pubsub_topic" "trigger-topic" {
-  project = "${var.project_id}"
-  name    = "gsuite-admin-logs-topic-trigger"
-}
+  provider = "google"
+  project  = "${var.project_id}"
+  name     = "gsuite-admin-logs-topic-trigger"
+} 
 
-// Work Around to create a cloud scheduler as this is not a supporter resources in terraform currently
-resource "null_resource" "cloud-scheduler" {
-  provisioner "local-exec" {
-    when = "create"
-    command = "gcloud beta scheduler jobs create pubsub gsuite-audit-log-scheduler --schedule=\"${var.cs_schedule}\" --topic=${google_pubsub_topic.trigger-topic.name} --message-body='{\"PROJECT_ID\":\"${var.project_id}\",\"GSUITE_ADMIN_USER\":\"${var.gsuite_admin_user}\"}' --project=${var.project_id}" 
+
+//Work Around due to non-supported features of cloudfunctions
+resource "google_cloudfunctions_function" "gsuite-exporter-function" {
+  provider              = "google-beta"
+  name                  = "${var.name}-gsuite-exporter"
+  description           = "Google Cloud Function to grab Gsuite Admin Audit Logs "
+  available_memory_mb   = 128
+  source_archive_bucket = "${google_storage_bucket.bucket.name}"
+  source_archive_object = "${google_storage_bucket_object.archive.name}"
+  timeout               = 60
+  entry_point           = "run"
+  service_account_email = "${var.gsuite_exporter_service_account}"
+  runtime               = "python37"
+
+  event_trigger = {
+    event_type = "google.pubsub.topic.publish"
+    resource = "${google_pubsub_topic.trigger-topic.name}"
   }
 
-  provisioner "local-exec" {
-    when = "destroy"
-    command = "gcloud beta scheduler jobs delete gsuite-audit-log-scheduler --project=${var.project_id} --quiet"
+}
+
+resource "google_cloud_scheduler_job" "gsuite-exporter-trigger-job" {
+  provider    = "google-beta"
+  project     = "${var.project_id}"
+  name        = "${var.name}-gsuite-exporter-trigger"
+  description = "A Cloud Scheduler Job to run the Gsuite-Exporter Cloud Function on a schedule"
+  schedule    = "${var.cs_schedule}"
+  pubsub_target {
+    topic_name = "${google_pubsub_topic.trigger-topic.id}"
+    data       = "${base64encode("{\"PROJECT_ID\":\"${var.project_id}\",\"GSUITE_ADMIN_USER\":\"${var.gsuite_admin_user}\"}")}"
   }
 }

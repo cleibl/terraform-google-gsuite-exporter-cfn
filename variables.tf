@@ -5,7 +5,7 @@ variable "project_id" {
 variable "region" {
     // To-Do: Add request to add region as parameter for cloudfunction resource
     description = "The Region to deploy the cloudfunction.  Currently this is only available in us-central-1"
-    default = "us-central1"
+    default = "us-east1"
 }
 variable "name" {
     description = "The Prefix for resource names"
